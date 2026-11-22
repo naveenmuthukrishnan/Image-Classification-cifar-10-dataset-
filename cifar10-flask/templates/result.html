@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}PixelSense · {{ prediction.name|capitalize }}{% endblock %}
+
+{% block content %}
+<section class="result-head">
+  <span class="pill">✅ Prediction ready</span>
+  <h1>It looks like a <span class="gradient-text">{{ prediction.name }}</span></h1>
+</section>
+
+<section class="result-grid">
+  <div class="card images-card">
+    <div class="img-pair">
+      <figure>
+        <img src="{{ original_uri }}" alt="Your uploaded image">
+        <figcaption>Your upload</figcaption>
+      </figure>
+
+      <div class="arrow" aria-hidden="true">→</div>
+
+      <figure>
+        <img class="pixelated" src="{{ model_uri }}" alt="The same image at 32 by 32 pixels">
+        <figcaption>What the model sees · 32 × 32</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="card verdict-card" style="--c: {{ prediction.color }}">
+    <div class="ring" style="--pct: {{ prediction.pct }}">
+      <div class="ring-inner">
+        <span class="ring-emoji">{{ prediction.emoji }}</span>
+        <span class="ring-pct">{{ prediction.pct }}%</span>
+      </div>
+    </div>
+    <h2>{{ prediction.name|capitalize }}</h2>
+    <p class="muted">confidence</p>
+
+    {% if prediction.pct < 50 %}
+      <p class="warn">
+        🤔 The model isn't very sure about this one. CIFAR-10 only knows ten classes,
+        so anything outside them gets forced into the closest match.
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="card breakdown">
+  <h3>Full probability breakdown</h3>
+  {% for r in results %}
+    <div class="bar-row {% if loop.first %}top{% endif %}" style="--c: {{ r.color }}">
+      <span class="bar-label">{{ r.emoji }} {{ r.name|capitalize }}</span>
+      <div class="bar-track"><div class="bar-fill" style="width: {{ r.pct }}%"></div></div>
+      <span class="bar-pct">{{ r.pct }}%</span>
+    </div>
+  {% endfor %}
+</section>
+
+<div class="actions">
+  <a class="btn" href="{{ url_for('index') }}">⬆ Try another image</a>
+</div>
+{% endblock %}

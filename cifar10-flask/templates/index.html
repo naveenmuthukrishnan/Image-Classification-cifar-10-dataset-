@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}PixelSense · Upload an image{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <span class="pill">⚡ CIFAR-10 · Deep Learning POC</span>
+  <h1>Drop a picture.<br><span class="gradient-text">See what the model sees.</span></h1>
+  <p class="lead">
+    Upload any colour image. It gets shrunk to <strong>32 × 32 × 3</strong> and passed through the
+    trained network, which picks one of ten classes.
+  </p>
+</section>
+
+<section class="card upload-card">
+  <!-- action uses url_for('predict') -> the URL of the predict() function in app.py
+       enctype="multipart/form-data" is REQUIRED or the file never reaches request.files
+       name="image" must match request.files.get("image") in app.py -->
+  <form id="upload-form" action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
+    <label class="dropzone" id="dropzone" for="image-input">
+      <input type="file" id="image-input" name="image" accept="image/*" required>
+
+      <div class="dz-empty" id="dz-empty">
+        <div class="dz-icon">🖼️</div>
+        <p class="dz-title">Drag &amp; drop your image here</p>
+        <p class="dz-sub">or <span class="link">browse files</span> · PNG, JPG, WEBP · max 5 MB</p>
+      </div>
+
+      <img id="preview" class="dz-preview" alt="Selected image preview" hidden>
+    </label>
+
+    <p class="file-name" id="file-name"></p>
+
+    <button type="submit" class="btn" id="predict-btn">
+      <span class="btn-text">Classify image</span>
+      <span class="spinner" aria-hidden="true"></span>
+    </button>
+  </form>
+</section>
+
+<section class="classes">
+  <h2>The 10 classes it knows</h2>
+  <div class="chip-grid">
+    <!-- "classes" is the list that app.py passed into render_template -->
+    {% for c in classes %}
+      <div class="chip" style="--c: {{ c.color }}">
+        <span class="chip-emoji">{{ c.emoji }}</span>{{ c.name|capitalize }}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
